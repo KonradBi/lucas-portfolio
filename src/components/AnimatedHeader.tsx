@@ -1,113 +1,57 @@
 'use client';
 
+import React from 'react';
 import { motion } from 'framer-motion';
 
-interface AnimatedHeaderProps {
+interface Props {
   title: string;
   subtitle?: string;
-  align?: 'left' | 'center';
+  align?: 'left' | 'center' | 'right';
   size?: 'normal' | 'large';
-  disableLetterAnimation?: boolean;
 }
 
-const letterAnimation = {
-  initial: {
-    opacity: 0,
-    y: 20,
-    rotateX: 90,
-    filter: "blur(10px)"
-  },
-  animate: {
-    opacity: 1,
-    y: 0,
-    rotateX: 0,
-    filter: "blur(0px)"
-  }
-};
+export default function AnimatedHeader({ title, subtitle, align = 'left', size = 'normal' }: Props) {
+  const containerClass = {
+    left: 'text-left',
+    center: 'text-center',
+    right: 'text-right'
+  }[align];
 
-const containerAnimation = {
-  animate: {
-    transition: {
-      staggerChildren: 0.035,
-      delayChildren: 0.2,
-    }
-  }
-};
+  const lineClass = {
+    left: 'mr-auto',
+    center: 'mx-auto',
+    right: 'ml-auto'
+  }[align];
 
-export default function AnimatedHeader({ 
-  title, 
-  subtitle, 
-  align = 'left',
-  size = 'normal',
-  disableLetterAnimation = false
-}: AnimatedHeaderProps) {
+  const titleClass = size === 'large' ? 'text-4xl md:text-5xl' : 'text-3xl';
+
   return (
-    <div className={`space-y-6 ${align === 'center' ? 'text-center' : ''}`}>
+    <div className={containerClass}>
       <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 0.5 }}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       >
-        <div className="relative space-y-4">
-          <div className="relative">
-            <div className="absolute -inset-1 blur-xl opacity-20 bg-gradient-to-r from-blue-500 to-purple-500" />
-            <h2 className={`relative text-white font-light transform-gpu transition-transform duration-1000 hover:scale-105 ${
-              size === 'large' ? 'text-4xl md:text-5xl' : 'text-4xl'
-            }`}>
-              {disableLetterAnimation ? (
-                title
-              ) : (
-                <motion.span
-                  initial="initial"
-                  whileInView="animate"
-                  viewport={{ once: true, margin: '-100px' }}
-                  variants={containerAnimation}
-                  style={{ display: 'inline-block', perspective: '1000px' }}
-                  aria-label={title}
-                >
-                  {title.split('').map((char, index) => (
-                    <motion.span
-                      key={index}
-                      variants={letterAnimation}
-                      transition={{
-                        duration: 0.5,
-                        ease: [0.215, 0.610, 0.355, 1.000],
-                        opacity: { duration: 0.15 }
-                      }}
-                      style={{ 
-                        display: 'inline-block',
-                        transformOrigin: 'bottom',
-                        whiteSpace: 'pre'
-                      }}
-                    >
-                      {char === ' ' ? '\u00A0' : char}
-                    </motion.span>
-                  ))}
-                </motion.span>
-              )}
-            </h2>
-          </div>
-
-          <div className="h-[1px] w-16 bg-white/20" />
-
-          {subtitle && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-100px' }}
-              transition={{ 
-                duration: 0.6,
-                delay: 0.5,
-                ease: [0.215, 0.610, 0.355, 1.000]
-              }}
-            >
-              <p className="text-blue-300/70 italic tracking-wide">
-                {subtitle}
-              </p>
-            </motion.div>
-          )}
-        </div>
+        <h2 className={`${titleClass} font-light tracking-wide text-white/90`}>
+          {title}
+        </h2>
+        {subtitle && (
+          <p className="mt-2 text-white/50">
+            {subtitle}
+          </p>
+        )}
+        <motion.div
+          className={`h-px w-24 bg-gradient-to-r from-white/10 via-white/20 to-white/10 mt-6 ${lineClass}`}
+          initial={{ scaleX: 0, opacity: 0 }}
+          whileInView={{ scaleX: 1, opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ 
+            duration: 0.8, 
+            delay: 0.2,
+            ease: [0.22, 1, 0.36, 1]
+          }}
+        />
       </motion.div>
     </div>
   );
