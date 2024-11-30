@@ -160,6 +160,7 @@ export default function About() {
             <AnimatedHeader 
               title="Traces" 
               subtitle="Digital footprints across time"
+              align="left"
             />
             
             <div className="space-y-6 relative backdrop-blur-[2px]">

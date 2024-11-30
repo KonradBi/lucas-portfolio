@@ -24,6 +24,8 @@ const formAnimation = {
 
 export default function Contact() {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({
     message: '',
     contact: ''
@@ -31,13 +33,29 @@ export default function Contact() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    setIsLoading(true);
+    setError(null);
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setFormData({ message: '', contact: '' });
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+
       setIsSubmitted(true);
-    } catch (error) {
-      console.error('Error submitting form:', error);
+      setFormData({ message: '', contact: '' });
+    } catch (err) {
+      setError('Failed to send message. Please try again later.');
+      console.error('Submission error:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -59,9 +77,9 @@ export default function Contact() {
             />
           </div>
 
-          {/* Simple Form */}
+          {/* Form */}
           {!isSubmitted ? (
-            <div className="space-y-8 form-step">
+            <form onSubmit={handleSubmit} className="space-y-8">
               <div className="space-y-6">
                 <motion.div 
                   className="relative group"
@@ -74,6 +92,7 @@ export default function Contact() {
                     placeholder="Your message..."
                     className="w-full h-48 bg-white/5 border border-white/10 rounded-lg px-6 py-4 text-white/70 focus:outline-none focus:border-blue-500/50 transition-colors duration-300 placeholder:text-white/30"
                     required
+                    disabled={isLoading}
                   />
                   <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-blue-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                 </motion.div>
@@ -90,10 +109,21 @@ export default function Contact() {
                     placeholder="Your email or preferred contact method"
                     className="w-full bg-white/5 border border-white/10 rounded-lg px-6 py-4 text-white/70 focus:outline-none focus:border-blue-500/50 transition-colors duration-300 placeholder:text-white/30"
                     required
+                    disabled={isLoading}
                   />
                   <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-blue-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                 </motion.div>
               </div>
+
+              {error && (
+                <motion.div 
+                  className="text-red-400 text-center"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  {error}
+                </motion.div>
+              )}
 
               <motion.div 
                 className="flex justify-center"
@@ -101,15 +131,18 @@ export default function Contact() {
                 custom={3}
               >
                 <button
-                  onClick={handleSubmit}
-                  className="relative px-12 py-4 text-sm tracking-wider uppercase text-white overflow-hidden group"
+                  type="submit"
+                  disabled={isLoading}
+                  className="relative px-12 py-4 text-sm tracking-wider uppercase text-white overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <span className="relative z-10">Send</span>
+                  <span className="relative z-10">
+                    {isLoading ? 'Sending...' : 'Send'}
+                  </span>
                   <div className="absolute inset-0 border border-white/10 group-hover:border-white/20 transition-colors duration-300" />
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-blue-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                 </button>
               </motion.div>
-            </div>
+            </form>
           ) : (
             <motion.div 
               className="text-center space-y-4"
