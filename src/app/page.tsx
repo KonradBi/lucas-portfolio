@@ -1,9 +1,12 @@
 import type { Metadata } from 'next';
-import HeroSection from '@/components/HeroSection';
-import Gallery from '@/components/Gallery';
-import About from '@/components/About';
-import WorldMap from '@/components/WorldMap';
+import dynamic from 'next/dynamic';
 import Contact from '@/components/Contact';
+
+// Dynamische Imports für Komponenten mit Three.js
+const HeroSection = dynamic(() => import('@/components/HeroSection'), { ssr: false });
+const Gallery = dynamic(() => import('@/components/Gallery'), { ssr: false });
+const WorldMap = dynamic(() => import('@/components/WorldMap'), { ssr: false });
+const About = dynamic(() => import('@/components/About'), { ssr: false });
 
 export const metadata: Metadata = {
   title: 'Lukas Vandeverre | Contemporary Artist',

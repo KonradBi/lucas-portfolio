@@ -5,6 +5,7 @@ import Image from 'next/image';
 import * as THREE from 'three';
 import AnimatedHeader from './AnimatedHeader';
 import { motion } from 'framer-motion';
+import dynamic from 'next/dynamic';
 
 interface Artwork {
   id: number;
@@ -339,9 +340,11 @@ const ArtworkCard = ({ artwork, onClick }: { artwork: Artwork; onClick: () => vo
   );
 };
 
-export default function Gallery() {
+function Gallery() {
   const [selectedArtwork, setSelectedArtwork] = useState<Artwork | null>(null);
   const [showInquiry, setShowInquiry] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [inquiryStep, setInquiryStep] = useState(1);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [formData, setFormData] = useState<InquiryForm>({
@@ -426,6 +429,144 @@ export default function Gallery() {
       total: totalEditions
     };
   };
+
+  useEffect(() => {
+    if (!containerRef.current || typeof window === 'undefined') return;
+
+    // Initialisiere Dimensionen
+    setDimensions({
+      width: containerRef.current.clientWidth,
+      height: containerRef.current.clientHeight
+    });
+
+    // Setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, dimensions.width / dimensions.height, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ 
+      alpha: true, 
+      antialias: true,
+      powerPreference: "high-performance"
+    });
+    
+    renderer.setSize(dimensions.width, dimensions.height);
+    renderer.setClearColor(0x000000, 0);
+    containerRef.current.appendChild(renderer.domElement);
+
+    // Create particles
+    const geometry = new THREE.BufferGeometry();
+    const particlesCount = 2000;
+    const positions = new Float32Array(particlesCount * 3);
+    const colors = new Float32Array(particlesCount * 3);
+    const sizes = new Float32Array(particlesCount);
+
+    for(let i = 0; i < particlesCount * 3; i += 3) {
+      // Position
+      positions[i] = (Math.random() - 0.5) * 20;      // x
+      positions[i + 1] = (Math.random() - 0.5) * 10;  // y
+      positions[i + 2] = (Math.random() - 0.5) * 10;  // z
+      
+      // Color - purple/blue palette
+      colors[i] = 0.6 + Math.random() * 0.2;     // R
+      colors[i + 1] = 0.2 + Math.random() * 0.2; // G
+      colors[i + 2] = 1.0;                       // B
+      
+      // Size
+      sizes[i/3] = Math.random() * 2 + 0.5;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+    const material = new THREE.ShaderMaterial({
+      uniforms: {
+        uTime: { value: 0 },
+        uPixelRatio: { value: renderer.getPixelRatio() }
+      },
+      vertexShader: `
+        uniform float uTime;
+        uniform float uPixelRatio;
+        attribute float size;
+        attribute vec3 color;
+        varying vec3 vColor;
+        
+        void main() {
+          vColor = color;
+          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+          
+          // Wave animation
+          float wave = sin(uTime * 0.3 + position.x + position.y + position.z) * 0.2;
+          mvPosition.y += wave;
+          
+          gl_Position = projectionMatrix * mvPosition;
+          gl_PointSize = size * 3.0 * uPixelRatio * (1.0 / -mvPosition.z);
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vColor;
+        
+        void main() {
+          float distanceToCenter = length(gl_PointCoord - vec2(0.5));
+          float alpha = 0.05 / (distanceToCenter);
+          gl_FragColor = vec4(vColor, alpha);
+        }
+      `,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+
+    const particles = new THREE.Points(geometry, material);
+    scene.add(particles);
+
+    camera.position.z = 5;
+
+    // Animation
+    let time = 0;
+    const animate = () => {
+      requestAnimationFrame(animate);
+      time += 0.01;
+
+      material.uniforms.uTime.value = time;
+      particles.rotation.y = time * 0.05;
+      particles.rotation.x = Math.sin(time * 0.025) * 0.1;
+
+      renderer.render(scene, camera);
+    };
+    animate();
+
+    // Handle resize
+    const handleResize = () => {
+      if (!containerRef.current) return;
+      
+      const newWidth = containerRef.current.clientWidth;
+      const newHeight = containerRef.current.clientHeight;
+      setDimensions({ width: newWidth, height: newHeight });
+      
+      camera.aspect = newWidth / newHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(newWidth, newHeight);
+      material.uniforms.uPixelRatio.value = renderer.getPixelRatio();
+    };
+
+    // Verzögere das erste Rendering
+    requestAnimationFrame(() => {
+      handleResize();
+      animate();
+    });
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (containerRef.current?.contains(renderer.domElement)) {
+        containerRef.current.removeChild(renderer.domElement);
+      }
+      geometry.dispose();
+      material.dispose();
+      renderer.dispose();
+    };
+  }, []);
 
   return (
     <div id="gallery" className="relative min-h-screen bg-black/90" onContextMenu={(e) => e.preventDefault()}>
@@ -777,4 +918,8 @@ export default function Gallery() {
       `}</style>
     </div>
   );
-} 
+}
+
+export default dynamic(() => Promise.resolve(Gallery), {
+  ssr: false
+}); 

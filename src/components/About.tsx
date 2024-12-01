@@ -5,14 +5,15 @@ import * as THREE from 'three';
 import { gsap } from 'gsap';
 import Image from 'next/image';
 import AnimatedHeader from './AnimatedHeader';
+import dynamic from 'next/dynamic';
 
-export default function About() {
+function About() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || typeof window === 'undefined') return;
 
     // Initialisiere Dimensionen
     setDimensions({
@@ -149,7 +150,7 @@ export default function About() {
       geometry.dispose();
       material.dispose();
     };
-  }, [dimensions.width, dimensions.height]);
+  }, []);
 
   const timelineItems = [
     { year: '2018', text: 'First conceptual works emerge in European art scene' },
@@ -250,4 +251,8 @@ export default function About() {
       `}</style>
     </div>
   );
-} 
+}
+
+export default dynamic(() => Promise.resolve(About), {
+  ssr: false
+}); 

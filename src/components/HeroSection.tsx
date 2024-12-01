@@ -9,6 +9,7 @@ import { gsap } from 'gsap';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Italiana, Montserrat } from 'next/font/google';
+import dynamic from 'next/dynamic';
 
 const italiana = Italiana({ 
   subsets: ['latin'],
@@ -20,14 +21,14 @@ const montserrat = Montserrat({
   weight: ['200', '300'],
 });
 
-export default function HeroSection() {
+function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || typeof window === 'undefined') return;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -470,4 +471,8 @@ export default function HeroSection() {
       `}</style>
     </div>
   );
-} 
+}
+
+export default dynamic(() => Promise.resolve(HeroSection), {
+  ssr: false
+}); 
