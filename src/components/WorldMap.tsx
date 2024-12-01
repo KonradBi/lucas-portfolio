@@ -27,6 +27,11 @@ interface GlobeInstance {
         autoRotate: boolean;
         autoRotateSpeed: number;
         enableZoom: boolean;
+        enablePan: boolean;
+        minDistance: number;
+        maxDistance: number;
+        enableDamping: boolean;
+        dampingFactor: number;
     };
     pointOfView: (coords: { lat: number; lng: number; altitude: number }) => void;
     _destructor: () => void;
@@ -111,14 +116,32 @@ const WorldMapComponent: FC = () => {
         const controls = globeRef.current.controls();
         controls.autoRotate = true;
         controls.autoRotateSpeed = 0.25;
-        controls.enableZoom = true;
+        controls.enableZoom = false;
+        controls.enablePan = false;
+        controls.minDistance = 2.5;
+        controls.maxDistance = 2.5;
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.1;
 
         // Set initial position
         globeRef.current.pointOfView({ lat: 39.6, lng: -98.5, altitude: 2.5 });
 
+        // Prevent touch events from being captured
+        if (containerRef.current) {
+            containerRef.current.style.touchAction = 'none';
+            containerRef.current.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+            }, { passive: false });
+        }
+
         // Cleanup
         return () => {
             if (globeRef.current) {
+                if (containerRef.current) {
+                    containerRef.current.removeEventListener('touchmove', (e) => {
+                        e.preventDefault();
+                    });
+                }
                 globeRef.current._destructor();
             }
         };
@@ -139,7 +162,7 @@ const WorldMapComponent: FC = () => {
                 </div>
 
                 {/* Globe Container with fade effect */}
-                <div className="relative mb-32">
+                <div className="relative mb-32 pointer-events-none">
                     {/* Radial fade effect */}
                     <div className="absolute inset-0 -inset-x-[50%] -inset-y-[50%]">
                         <div className="absolute inset-0 bg-[#010208] opacity-0" style={{
