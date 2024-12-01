@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { gsap } from 'gsap';
 import Image from 'next/image';
 import AnimatedHeader from './AnimatedHeader';
 import dynamic from 'next/dynamic';
@@ -150,7 +149,7 @@ function About() {
       geometry.dispose();
       material.dispose();
     };
-  }, []);
+  }, [dimensions.width, dimensions.height]);
 
   const timelineItems = [
     { year: '2018', text: 'First conceptual works emerge in European art scene' },
