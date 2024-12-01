@@ -6,18 +6,31 @@ import Image from 'next/image';
 import AnimatedHeader from './AnimatedHeader';
 import dynamic from 'next/dynamic';
 
-function About() {
+const About = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [isMounted, setIsMounted] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
+  // Sofort prüfen, ob wir auf dem Client sind
   useEffect(() => {
-    setIsMounted(true);
+    setIsClient(true);
   }, []);
 
+  // Verzögerte Montierung für Three.js
   useEffect(() => {
-    if (!containerRef.current || typeof window === 'undefined' || !isMounted) return;
+    if (!isClient) return;
+    
+    const timer = setTimeout(() => {
+      setIsMounted(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [isClient]);
+
+  useEffect(() => {
+    if (!containerRef.current || !isClient || !isMounted) return;
 
     // Initialisiere Dimensionen
     setDimensions({
@@ -154,9 +167,10 @@ function About() {
       geometry.dispose();
       material.dispose();
     };
-  }, [dimensions.width, dimensions.height, isMounted]);
+  }, [dimensions.width, dimensions.height, isClient, isMounted]);
 
-  if (!isMounted) {
+  // Zeige einen leeren Container während des Server-Renderings und der Initialisierung
+  if (!isClient || !isMounted) {
     return <div className="min-h-screen bg-[#010208]" />;
   }
 
@@ -259,8 +273,10 @@ function About() {
       `}</style>
     </div>
   );
-}
+};
 
+// Exportiere die Komponente mit deaktiviertem SSR
 export default dynamic(() => Promise.resolve(About), {
-  ssr: false
+  ssr: false,
+  loading: () => <div className="min-h-screen bg-[#010208]" />
 }); 
