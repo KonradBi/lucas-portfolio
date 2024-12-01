@@ -229,7 +229,7 @@ function About() {
               <div className="relative p-6 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 hover:border-white/20 transition-colors duration-300">
                 <div className="relative overflow-hidden">
                   <p className="text-white/60 italic relative z-10">
-                    "Art exists in the space between reality and dreams, where the unseen becomes visible."
+                    &quot;Art exists in the space between reality and dreams, where the unseen becomes visible.&quot;
                   </p>
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-blue-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                 </div>
