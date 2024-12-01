@@ -789,7 +789,7 @@ function Gallery() {
                           </div>
                         </div>
                         <div className="text-white/50 text-sm italic">
-                          "Each collector edition is numbered and comes with a certificate of authenticity."
+                          &quot;Each collector edition is numbered and comes with a certificate of authenticity.&quot;
                         </div>
                       </div>
                     </div>
