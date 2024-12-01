@@ -809,7 +809,7 @@ function Gallery() {
                         </div>
                         <div className="h-[1px] w-16 bg-white/20 mx-auto" />
                         <p className="text-blue-300/70 italic max-w-xl mx-auto">
-                          "Each piece seeks a guardian who understands its essence, transcending mere ownership."
+                          &quot;Each piece seeks a guardian who understands its essence, transcending mere ownership.&quot;
                         </p>
                       </div>
 
