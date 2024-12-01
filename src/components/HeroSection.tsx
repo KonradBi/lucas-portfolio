@@ -427,7 +427,7 @@ function HeroSection() {
                 Where Imagination Becomes Reality
               </p>
               <p className="text-sm tracking-wide text-blue-200/50 max-w-lg mx-auto italic">
-                "Art is not what you see, but what you make others see"
+                &quot;Art is not what you see, but what you make others see&quot;
               </p>
             </div>
           </div>

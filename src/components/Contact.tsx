@@ -182,7 +182,7 @@ export default function Contact() {
                 whileInView={{ opacity: 1 }}
                 transition={{ delay: 0.5, duration: 0.8 }}
               >
-                "True art finds its guardian through intention, not transaction. Each piece awaits its destined protector."
+                &quot;True art finds its guardian through intention, not transaction. Each piece awaits its destined protector.&quot;
               </motion.p>
               <motion.p 
                 className="text-white/40 text-sm mt-2"
