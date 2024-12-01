@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from 'react';
 import Globe from 'globe.gl';
+import dynamic from 'next/dynamic'
+import { FC } from 'react'
 
 interface CityData {
     city: string;
@@ -61,7 +63,7 @@ const generateArcs = () => {
     return arcs;
 };
 
-const WorldMap = () => {
+const WorldMapComponent: FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const globeRef = useRef<any>(null);
 
@@ -159,5 +161,10 @@ const WorldMap = () => {
         </section>
     );
 };
+
+// Exportiere eine neue dynamisch geladene Version der Komponente mit deaktiviertem SSR
+export const WorldMap = dynamic(() => Promise.resolve(WorldMapComponent), {
+    ssr: false
+})
 
 export default WorldMap;

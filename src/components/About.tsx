@@ -9,19 +9,26 @@ import AnimatedHeader from './AnimatedHeader';
 export default function About() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     if (!containerRef.current) return;
 
+    // Initialisiere Dimensionen
+    setDimensions({
+      width: window.innerWidth,
+      height: window.innerHeight
+    });
+
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(75, dimensions.width / dimensions.height, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ 
       alpha: true,
       antialias: true,
       powerPreference: "high-performance"
     });
 
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(dimensions.width, dimensions.height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     containerRef.current.appendChild(renderer.domElement);
 
@@ -110,11 +117,22 @@ export default function About() {
 
     // Handle resize
     const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
+      const newWidth = window.innerWidth;
+      const newHeight = window.innerHeight;
+      setDimensions({ width: newWidth, height: newHeight });
+      
+      camera.aspect = newWidth / newHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setSize(newWidth, newHeight);
       material.uniforms.uPixelRatio.value = renderer.getPixelRatio();
     };
+
+    // Verzögere das erste Rendering bis zum nächsten Frame
+    requestAnimationFrame(() => {
+      handleResize();
+      animate();
+    });
+
     window.addEventListener('resize', handleResize);
 
     // Intersection Observer for fade-in
@@ -131,7 +149,7 @@ export default function About() {
       geometry.dispose();
       material.dispose();
     };
-  }, []);
+  }, [dimensions.width, dimensions.height]);
 
   const timelineItems = [
     { year: '2018', text: 'First conceptual works emerge in European art scene' },

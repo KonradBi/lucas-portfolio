@@ -89,20 +89,27 @@ const artworks: Artwork[] = [
 
 const PrintCollection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     if (!containerRef.current) return;
 
+    // Initialisiere Dimensionen
+    setDimensions({
+      width: containerRef.current.clientWidth,
+      height: containerRef.current.clientHeight
+    });
+
     // Setup
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, containerRef.current.clientWidth / containerRef.current.clientHeight, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(75, dimensions.width / dimensions.height, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ 
       alpha: true, 
       antialias: true,
       powerPreference: "high-performance"
     });
     
-    renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
+    renderer.setSize(dimensions.width, dimensions.height);
     renderer.setClearColor(0x000000, 0);
     containerRef.current.appendChild(renderer.domElement);
 
@@ -192,24 +199,35 @@ const PrintCollection = () => {
     // Handle resize
     const handleResize = () => {
       if (!containerRef.current) return;
-      const width = containerRef.current.clientWidth;
-      const height = containerRef.current.clientHeight;
       
-      camera.aspect = width / height;
+      const newWidth = containerRef.current.clientWidth;
+      const newHeight = containerRef.current.clientHeight;
+      setDimensions({ width: newWidth, height: newHeight });
+      
+      camera.aspect = newWidth / newHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(width, height);
+      renderer.setSize(newWidth, newHeight);
       material.uniforms.uPixelRatio.value = renderer.getPixelRatio();
     };
+
+    // Verzögere das erste Rendering
+    requestAnimationFrame(() => {
+      handleResize();
+      animate();
+    });
+
     window.addEventListener('resize', handleResize);
 
     return () => {
       window.removeEventListener('resize', handleResize);
-      containerRef.current?.removeChild(renderer.domElement);
+      if (containerRef.current?.contains(renderer.domElement)) {
+        containerRef.current.removeChild(renderer.domElement);
+      }
       geometry.dispose();
       material.dispose();
       renderer.dispose();
     };
-  }, []);
+  }, [dimensions.width, dimensions.height]);
 
   return (
     <div className="relative min-h-[800px] py-24">

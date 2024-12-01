@@ -17,14 +17,21 @@ const navItems: NavItem[] = [
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const orbsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleMenuClick = () => {
     setIsOpen(!isOpen);
   };
 
   const handleOrbClick = (id: string) => {
+    if (!mounted) return;
+    
     const section = document.getElementById(id);
     if (section) {
       section.scrollIntoView({ behavior: 'smooth' });
@@ -33,7 +40,7 @@ export default function Navigation() {
   };
 
   useEffect(() => {
-    if (!menuRef.current || !orbsRef.current) return;
+    if (!mounted || !menuRef.current || !orbsRef.current) return;
 
     const menu = menuRef.current;
     const orbs = orbsRef.current;
@@ -97,7 +104,11 @@ export default function Navigation() {
         ease: 'power2.in'
       });
     }
-  }, [isOpen]);
+  }, [isOpen, mounted]);
+
+  if (!mounted) {
+    return null; // oder ein Loading-State
+  }
 
   return (
     <nav className="fixed left-8 top-1/2 -translate-y-1/2 z-50">
