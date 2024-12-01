@@ -88,7 +88,7 @@ const WorldMapComponent: FC = () => {
         // Initialize globe
         globeRef.current = Globe()
             .globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg')
-            .backgroundColor('rgba(1,2,8,0.0)')
+            .backgroundColor('#010208')
             .pointsData(citiesData)
             .pointAltitude(0.01)
             .pointRadius('size')
@@ -163,9 +163,17 @@ const WorldMapComponent: FC = () => {
 
                 {/* Globe Container with fade effect */}
                 <div className="relative mb-32">
+                    {/* Globe */}
+                    <div className="relative">
+                        <div 
+                            ref={containerRef} 
+                            className="relative w-full aspect-[21/9] max-h-[400px] bg-[#010208]"
+                        />
+                    </div>
+
                     {/* Radial fade effect */}
                     <div className="absolute inset-0 -inset-x-[50%] -inset-y-[50%] pointer-events-none">
-                        <div className="absolute inset-0 bg-[#010208] opacity-100" style={{
+                        <div className="absolute inset-0" style={{
                             background: 'radial-gradient(circle at center, transparent 30%, #010208 70%)'
                         }} />
                     </div>
@@ -176,15 +184,6 @@ const WorldMapComponent: FC = () => {
                             background: 'radial-gradient(circle at center, rgba(147, 51, 234, 0.2) 0%, transparent 70%)',
                             filter: 'blur(40px)'
                         }} />
-                    </div>
-
-                    {/* Globe */}
-                    <div className="relative">
-                        <div 
-                            ref={containerRef} 
-                            className="relative w-full aspect-[21/9] max-h-[400px]"
-                            style={{ zIndex: 10 }}
-                        />
                     </div>
                 </div>
             </div>
