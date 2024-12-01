@@ -162,16 +162,16 @@ const WorldMapComponent: FC = () => {
                 </div>
 
                 {/* Globe Container with fade effect */}
-                <div className="relative mb-32 pointer-events-none">
+                <div className="relative mb-32">
                     {/* Radial fade effect */}
-                    <div className="absolute inset-0 -inset-x-[50%] -inset-y-[50%]">
-                        <div className="absolute inset-0 bg-[#010208] opacity-0" style={{
+                    <div className="absolute inset-0 -inset-x-[50%] -inset-y-[50%] pointer-events-none">
+                        <div className="absolute inset-0 bg-[#010208] opacity-100" style={{
                             background: 'radial-gradient(circle at center, transparent 30%, #010208 70%)'
                         }} />
                     </div>
 
                     {/* Purple glow with fade */}
-                    <div className="absolute inset-0 -inset-x-[25%] -inset-y-[25%]">
+                    <div className="absolute inset-0 -inset-x-[25%] -inset-y-[25%] pointer-events-none">
                         <div className="absolute inset-0" style={{
                             background: 'radial-gradient(circle at center, rgba(147, 51, 234, 0.2) 0%, transparent 70%)',
                             filter: 'blur(40px)'
