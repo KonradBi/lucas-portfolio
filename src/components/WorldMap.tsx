@@ -22,6 +22,16 @@ interface ArcData {
     color: string;
 }
 
+interface GlobeInstance {
+    controls: () => {
+        autoRotate: boolean;
+        autoRotateSpeed: number;
+        enableZoom: boolean;
+    };
+    pointOfView: (coords: { lat: number; lng: number; altitude: number }) => void;
+    _destructor: () => void;
+}
+
 // Sample data of private art collectors
 const citiesData: CityData[] = [
     { city: 'Manhattan', lat: 40.7831, lng: -73.9712, size: 0.5, color: '#ff9b9b', collection: 'Private Collection' },
@@ -65,7 +75,7 @@ const generateArcs = () => {
 
 const WorldMapComponent: FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
-    const globeRef = useRef<any>(null);
+    const globeRef = useRef<GlobeInstance | null>(null);
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -124,7 +134,7 @@ const WorldMapComponent: FC = () => {
                     </h2>
                     <div className="h-[1px] w-16 bg-white/20 mx-auto" />
                     <p className="text-white/60 text-lg max-w-2xl mx-auto">
-                        Lukas Vandeverre's digital artworks are housed in distinguished private collections across the globe
+                        Lukas Vandeverre&apos;s digital artworks are housed in distinguished private collections across the globe
                     </p>
                 </div>
 
