@@ -31,6 +31,7 @@ function HeroSection() {
     if (!containerRef.current || typeof window === 'undefined') return;
 
     const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x010208);
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ 
       antialias: true,
@@ -395,21 +396,21 @@ function HeroSection() {
                     transition={{ duration: 0.3 }}
                   >
                     <div className="absolute -inset-10 blur-3xl opacity-20 bg-gradient-to-r from-blue-500/30 via-rose-300/20 to-purple-500/30 group-hover:opacity-30 transition-opacity duration-500" />
-                    <h1 className="name-first text-[13rem] leading-none tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/90 relative z-10">
+                    <h1 className="name-first text-[clamp(4rem,20vw,13rem)] leading-none tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/90 relative z-10">
                       LUKAS
                     </h1>
                   </motion.div>
                   
                   <div className="relative h-[4rem]">
                     <motion.h2 
-                      className="name-last absolute inset-0 text-4xl tracking-[1em] text-rose-100/90 font-light uppercase"
+                      className="name-last absolute inset-0 text-[clamp(1rem,4vw,2rem)] tracking-[0.5em] md:tracking-[1em] text-rose-100/90 font-light uppercase"
                       whileHover={{ letterSpacing: "1.2em" }}
                       transition={{ duration: 0.5 }}
                     >
                       Vandeverre
                     </motion.h2>
                     <motion.h2 
-                      className="name-last-mirror absolute inset-0 text-4xl tracking-[1em] text-white/20 font-light uppercase transform scale-y-[-1] origin-top"
+                      className="name-last-mirror absolute inset-0 text-[clamp(1rem,4vw,2rem)] tracking-[0.5em] md:tracking-[1em] text-white/20 font-light uppercase transform scale-y-[-1] origin-top"
                       whileHover={{ letterSpacing: "1.2em" }}
                       transition={{ duration: 0.5 }}
                     >
@@ -433,7 +434,7 @@ function HeroSection() {
           </div>
 
           <div 
-            className="absolute left-1/2 -translate-x-1/2 bottom-12 cursor-pointer opacity-70 hover:opacity-100 transition-opacity duration-500"
+            className="absolute left-1/2 -translate-x-1/2 bottom-12 cursor-pointer opacity-70 hover:opacity-100 transition-opacity duration-500 w-full text-center"
             onClick={handleScrollToGallery}
           >
             <div className="flex flex-col items-center space-y-6">
