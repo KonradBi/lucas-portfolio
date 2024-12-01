@@ -10,9 +10,14 @@ function About() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    if (!containerRef.current || typeof window === 'undefined') return;
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!containerRef.current || typeof window === 'undefined' || !isMounted) return;
 
     // Initialisiere Dimensionen
     setDimensions({
@@ -149,7 +154,11 @@ function About() {
       geometry.dispose();
       material.dispose();
     };
-  }, [dimensions.width, dimensions.height]);
+  }, [dimensions.width, dimensions.height, isMounted]);
+
+  if (!isMounted) {
+    return <div className="min-h-screen bg-[#010208]" />;
+  }
 
   const timelineItems = [
     { year: '2018', text: 'First conceptual works emerge in European art scene' },
