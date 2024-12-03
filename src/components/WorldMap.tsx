@@ -27,11 +27,6 @@ interface GlobeInstance {
         autoRotate: boolean;
         autoRotateSpeed: number;
         enableZoom: boolean;
-        enablePan: boolean;
-        minDistance: number;
-        maxDistance: number;
-        enableDamping: boolean;
-        dampingFactor: number;
     };
     pointOfView: (coords: { lat: number; lng: number; altitude: number }) => void;
     _destructor: () => void;
@@ -88,7 +83,7 @@ const WorldMapComponent: FC = () => {
         // Initialize globe
         globeRef.current = Globe()
             .globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg')
-            .backgroundColor('#010208')
+            .backgroundColor('rgba(1,2,8,0.0)')
             .pointsData(citiesData)
             .pointAltitude(0.01)
             .pointRadius('size')
@@ -117,31 +112,13 @@ const WorldMapComponent: FC = () => {
         controls.autoRotate = true;
         controls.autoRotateSpeed = 0.25;
         controls.enableZoom = false;
-        controls.enablePan = false;
-        controls.minDistance = 2.5;
-        controls.maxDistance = 2.5;
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.1;
 
         // Set initial position
         globeRef.current.pointOfView({ lat: 39.6, lng: -98.5, altitude: 2.5 });
 
-        // Prevent touch events from being captured
-        if (containerRef.current) {
-            containerRef.current.style.touchAction = 'none';
-            containerRef.current.addEventListener('touchmove', (e) => {
-                e.preventDefault();
-            }, { passive: false });
-        }
-
         // Cleanup
         return () => {
             if (globeRef.current) {
-                if (containerRef.current) {
-                    containerRef.current.removeEventListener('touchmove', (e) => {
-                        e.preventDefault();
-                    });
-                }
                 globeRef.current._destructor();
             }
         };
@@ -163,27 +140,28 @@ const WorldMapComponent: FC = () => {
 
                 {/* Globe Container with fade effect */}
                 <div className="relative mb-32">
-                    {/* Globe */}
-                    <div className="relative">
-                        <div 
-                            ref={containerRef} 
-                            className="relative w-full aspect-[21/9] max-h-[400px] bg-[#010208]"
-                        />
-                    </div>
-
                     {/* Radial fade effect */}
-                    <div className="absolute inset-0 -inset-x-[50%] -inset-y-[50%] pointer-events-none">
-                        <div className="absolute inset-0" style={{
+                    <div className="absolute inset-0 -inset-x-[50%] -inset-y-[50%]">
+                        <div className="absolute inset-0 bg-[#010208] opacity-0" style={{
                             background: 'radial-gradient(circle at center, transparent 30%, #010208 70%)'
                         }} />
                     </div>
 
                     {/* Purple glow with fade */}
-                    <div className="absolute inset-0 -inset-x-[25%] -inset-y-[25%] pointer-events-none">
+                    <div className="absolute inset-0 -inset-x-[25%] -inset-y-[25%]">
                         <div className="absolute inset-0" style={{
                             background: 'radial-gradient(circle at center, rgba(147, 51, 234, 0.2) 0%, transparent 70%)',
                             filter: 'blur(40px)'
                         }} />
+                    </div>
+
+                    {/* Globe */}
+                    <div className="relative">
+                        <div 
+                            ref={containerRef} 
+                            className="relative w-full aspect-[21/9] max-h-[400px]"
+                            style={{ zIndex: 10 }}
+                        />
                     </div>
                 </div>
             </div>
